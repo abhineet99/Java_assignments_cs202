@@ -12,4 +12,11 @@
 #define DBL_BRACKETS 12
 #define RIGHT_BRACKET 13
 #define LEFT_BRACKET 14
+#define NAME 15
+#define FUNC_NAME 16
+#define VAR_NAME 17
+#define UNKNOWN 18
+#define SEMI_COLON 19
+#define CMT_START 20
+#define CMT_END 21
 

@@ -18,11 +18,14 @@
 ")"				return RIGHT_BRACKET;
 "{"				return LEFT_CURLY;
 "}"				return RIGHT_CURLY;
-
-[a-zA-Z][_a-zA-Z0-9]*	return IDENTIFIER;
-[1-9][0-9]*				return INTEGER;
+[a-z][a-z]* return NAME;
+[_a-z][_a-z]*    return FUNC_NAME;
+[a-z][a-z0-9]*    return VAR_NAME;
+"/*"	return CMT_START;
+"*/"    return CMT_END;
 [ \t\n]					;
-.					printf("unexpected character\n");
+";"		return SEMI_COLON;
+.					return UNKNOWN;
 
 %%
 
