@@ -4,7 +4,6 @@
 %option nounput yylineno
 
 %%
-:					return TYPE;
 "int"			return TYPE;
 "char"			return TYPE;
 "float"	return TYPE;
