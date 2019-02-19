@@ -10,4 +10,6 @@
 #define IDENTIFIER 10
 #define INTEGER 11
 #define DBL_BRACKETS 12
+#define RIGHT_BRACKET 13
+#define LEFT_BRACKET 14
 
