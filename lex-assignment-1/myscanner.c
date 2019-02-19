@@ -10,14 +10,22 @@ int main(void)
 {
 	int error_check=0;
 	int now_token,prev_token,next_token;
-	ntoken = yylex();
-	while(ntoken) {
-		if(ntoken==TYPE)
+	now_token = yylex();
+	while(now_token) {
+		if (now_token==TYPE)
+			printf("Line %d: ERROR: Function/Variable declaration without previous comment!\n ",yylineno);
+		else if (now_token==CMT_START)
+		{
+			while(now_token!=CMT_END)
+				now_token=yylex();
+			now_token=yylex();
+		}
+		if(now_token==TYPE)
 		{
 			next_token=yylex();
 			if (next_token==UNKNOWN)
 			{
-				printf("Line %d: ERROR: Function/Variable Name is not following conventions ",yylineno)
+				printf("Line %d: ERROR: Function/Variable Name is not following conventions\n ",yylineno);
 			}
 			else if(next_token==FUNC_NAME)
 			{
@@ -25,7 +33,7 @@ int main(void)
 				next_token=yylex();
 				if(next_token!=LEFT_BRACKET)
 				{
-				printf("Line %d: ERROR: Expected a '(' after function name",yylineno);
+				printf("Line %d: ERROR: Expected a '(' after function name\n",yylineno);
 				error_check=1;
 				}
 				else{
@@ -34,14 +42,14 @@ int main(void)
 						next_token=yylex();
 					}
 				next_token=yylex();
-				if(error_check==0)
-				{
-					if(next_token!=CMT_START)
-						printf("Line %d: ERROR: Expected a comment start after function name",yylineno);
-					else
-						while(next_token!=CMT_END)
-							next_token=yylex();
-				}	
+				// if(error_check==0)
+				// {
+				// 	if(next_token!=CMT_START)
+				// 		printf("Line %d: ERROR: Expected a comment start after function name",yylineno);
+				// 	else
+				// 		while(next_token!=CMT_END)
+				// 			next_token=yylex();
+				// }	
 			}
 			else if(next_token==VAR_NAME)
 			{
@@ -49,18 +57,18 @@ int main(void)
 				error_check=0;
 				if(next_token!=SEMI_COLON)
 				{
-					printf("Line %d: ERROR: Expected a semi colon after function name",yylineno);
+					printf("Line %d: ERROR: Expected a semi colon after function name\n",yylineno);
 					error_check=1;
 				}
-				if(error_check!=1)
-				{
-					next_token==yylex();
-					if(next_token!=CMT_START)
-						printf("Line %d: ERROR: Expected a comment start after function name",yylineno);
-					else
-						while(next_token!=CMT_END)
-							next_token=yylex();
-				}
+				// if(error_check!=1)
+				// {
+				// 	next_token==yylex();
+				// 	if(next_token!=CMT_START)
+				// 		printf("Line %d: ERROR: Expected a comment start after function name",yylineno);
+				// 	else
+				// 		while(next_token!=CMT_END)
+				// 			next_token=yylex();
+				// }
 			}
 		}
 		next_token=yylex();

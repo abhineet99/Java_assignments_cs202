@@ -19,4 +19,6 @@
 #define SEMI_COLON 19
 #define CMT_START 20
 #define CMT_END 21
+#define RIGHT_CURLY 22
+#define LEFT_CURLY 22
 
