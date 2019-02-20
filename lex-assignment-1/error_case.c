@@ -6,7 +6,10 @@ else return ‘T’;
 
 /* This is the driver function. */
  int main() {
- float max=100, min=10;
  /* Checks the range. */
+ float max=100, min_3=10;
+ /* Checks the range. */
+ 
+char WT_check();
 printf(“Wt is in range: %c”, WT_CHK(67, min, max));
 }
