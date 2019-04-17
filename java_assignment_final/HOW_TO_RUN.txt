@@ -1,0 +1,29 @@
+To run the code:
+There is an existing .jar file in the folder that has all the class files
+So the user needs to compile his main file using those java files
+STEPS:
+
+1) Setup the working directory as the directory containing the .jar file, which is "for_user" and the main.java file.
+2) Then, run the following commands:
+
+The commands are:
+To compile: javac -cp algorithms.jar: main.java 
+To run(after compiling): java -cp algorithms.jar: main
+
+
+The code is a demonstration of abstract design pattern in Java.
+
+How does the abstraction work:
+There are 2 concrete classes for finding mean and variance of a given integer sequence implemented in different files. They are the extensions of 2 abstract classes.
+The client does not have access to these classes rather it has been the access to an intermediate class.
+The client accesses the desired algorithm by using a string input telling what she/he wants and the intermediate class returns an object of the concrete class as per the user demand.
+The intermediate class takes the decision as to what concrete class has to be called. 
+So if any of the concrete class experiences a change there is no change required in the code of the client as the intermediate class manages the change.
+
+1) variance.java , arithmeticMean.java are 2 implementations of statsAlgorithms abstract class
+
+3) fetchAlgorithms.java is a factory class that acts as a middleman between the client code and the concrete classes.
+The client code creates an object of this intermediate class and passes strings as arguments to its functions, whose content decides what class's object is created by the fetchAlgorithms class and return to the user.
+
+Algorithms can be accessed using:
+statsAlgorithms algoObject=fetchAlgorithms.fetchAlgo("....name of algorithm....");
