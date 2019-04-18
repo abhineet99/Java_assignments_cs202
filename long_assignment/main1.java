@@ -1,5 +1,7 @@
 import java.awt.SystemTray;
 import java.util.*;
+import java.io.*;
+//import java.util.Scanner;
 class product{
     String category;
     String subcategory;
@@ -229,19 +231,33 @@ class customer{
         System.out.println("Success, funds added!");
     }
     public void addToCart(product productToBeAdded,int quantityDemanded){
-        cart.add(Pair(productToBeAdded,quantityDemanded));
+        Pair<product,Integer> pair= new Pair<product,Integer>(productToBeAdded,quantityDemanded);
+        cart.add(pair);
         System.out.println("Success, product added to your cart!");
     }
 }
 class main1{
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException{
         database myDatabase=new database();
-        while(1){
+        while(true){
             System.out.println("Enter 1 to use as admin, enter 0 to use as customer");
             Scanner intScanner=new Scanner(System.in);
             int whatTheUserWants=intScanner.nextInt();
             if(whatTheUserWants==1){
-
+                System.out.println("Enter:\n 1: to insert product/category \n 2: delete product/category \n 3: Search for a product \n 4: Modify a product \n 5: Exit as administrator");
+                int userChoice=intScanner.nextInt();
+                if(userChoice==1){
+                    System.out.println("Enter the category");
+                    BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
+                    String category= brObject.readLine();
+                    //String category=intScanner.nextLine();
+                    System.out.println("Enter the subcategory");
+                    String subcategory=brObject.readLine();
+                    System.out.println("Enter the product name");
+                    String productName=brObject.readLine();
+                    myDatabase.insert(category+">"+subcategory, productName);
+                }
+                
             }
             else if(whatTheUserWants==0){
 
