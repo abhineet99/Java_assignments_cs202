@@ -40,9 +40,18 @@ class database{
     public void insert(product productToBeAdded){
         String subcategory=productToBeAdded.subcategory;
         if(databaseMap.containsKey(subcategory)){
+            int flag=0;
             List<product> productListInThatCategory=databaseMap.get(subcategory);
+            for(int i=0;i<productListInThatCategory.size();i++){
+                if(productListInThatCategory.get(i).productName.equals(productToBeAdded.productName)){
+                    flag=1;
+                    System.out.println("Product being entered already exists, you may want to use modify functionality");
+                    break;
+                }
+                
+            }
+            if(flag==0)
             productListInThatCategory.add(productToBeAdded);
-            
         }
         else{
             List<product> productList =new ArrayList<product>();
@@ -234,7 +243,7 @@ class customer{
         this.remainingFunds=funds;
 
     }
-    public void chekoutCart(database myDatabase){
+    public void checkoutCart(database myDatabase){
         for (int i = 0; i < cart.size(); i++) {
             int prevRemainingFunds=this.remainingFunds;
             Pair prevPair=cart.get(i);
@@ -250,8 +259,12 @@ class customer{
     }
     public void addToCart(product productToBeAdded,int quantityDemanded){
         Pair<product,Integer> pair= new Pair<product,Integer>(productToBeAdded,quantityDemanded);
-        cart.add(pair);
-        System.out.println("Success, product added to your cart!");
+        if(quantityDemanded<=productToBeAdded.units){
+            cart.add(pair);
+            System.out.println("Success, product added to your cart!");
+        }
+        else
+        System.out.println("The number of units demanded aren't available!");
     }
 }
 class main1{
@@ -289,7 +302,13 @@ class main1{
                     }
                     else{
                         Pair<product,Integer> pair= new Pair<product,Integer>(productToBeAddedToCart,quantityDemanded);
-                        customerToBeAddedFromFile.cart.add(pair);
+                        if(quantityDemanded<=productToBeAddedToCart.units){
+                            customerToBeAddedFromFile.cart.add(pair);
+                            //System.out.println("Success, product added to your cart!");
+                        }
+                        else
+                        System.out.println("Some products have been removed from customer "+customerToBeAddedFromFile.customerID +"'s " +"cart because of unavailability!");
+                        //customerToBeAddedFromFile.cart.add(pair);
                     }
                 }
                 customerList.add(customerToBeAddedFromFile);
@@ -405,7 +424,7 @@ class main1{
                             }
                         }
                         else if(userChoice==3){
-                            myCustomer.chekoutCart(myDatabase);
+                            myCustomer.checkoutCart(myDatabase);
                         }
                         else{
                             break;
