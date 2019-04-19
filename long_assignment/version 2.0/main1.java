@@ -3,14 +3,6 @@ import java.util.*;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.charset.*;
-// import java.io.File;
-// import java.io.FileNotFoundException;
-// import java.io.PrintWriter;
-// import java.io.BufferedReader;
-// import java.io.FileNotFoundException;
-// import java.io.FileReader;
-// import java.io.IOException;
-//import java.util.Scanner;
 class product{
     //String category;
     String subcategory;
@@ -170,12 +162,8 @@ class database{
             List<product> productList =pair.getValue();
             for (int i = 0; i < productList.size(); i++) {
                 if(productName.equals((productList.get(i)).productName)){
-                    //System.out.println("The path to the product is:"+productList.get(i).subcategory+">"+productList.get(i).productName);
-                    
                     return productList.get(i);
-
                 }
-            //System.out.println(pair.getKey() + " = " + pair.getValue());
             it.remove(); // avoids a ConcurrentModificationException
             }
         }
@@ -248,7 +236,12 @@ class customer{
     }
     public void chekoutCart(database myDatabase){
         for (int i = 0; i < cart.size(); i++) {
+            int prevRemainingFunds=this.remainingFunds;
+            Pair prevPair=cart.get(i);
             this.remainingFunds=myDatabase.sale(cart.get(i).getL(),cart.get(i).getR(),this.remainingFunds);
+            if(remainingFunds<prevRemainingFunds){
+                cart.remove(prevPair);
+            }
         }
     }
     public void addFunds(int fundsToBeAdded){
@@ -263,7 +256,9 @@ class customer{
 }
 class main1{
     public static void main(String[] args) throws IOException{
+        List<customer> customerList=new ArrayList<customer>();
         database myDatabase=new database();
+        customer myCustomer=new customer("false", 0);
         BufferedReader bro = null;
         String strLine = "";
         try {
@@ -278,104 +273,154 @@ class main1{
         } catch (IOException e) {
             System.err.println("Unable to read database file!");
         }
-        customer myCustomer=new customer("1", 0);
+        try {
+            bro = new BufferedReader( new FileReader("customer.csv"));
+            while( (strLine = bro.readLine()) != null){
+                String[] customerData=strLine.split(",");
+                customer customerToBeAddedFromFile=new customer(customerData[0],Integer.parseInt(customerData[1]));
+                int customerCartSize=Integer.parseInt(customerData[2]);
+                for(int i=0;i<customerCartSize;i++){
+                    String productName=customerData[2*i+3];
+                    int quantityDemanded=Integer.parseInt(customerData[2*i+4]);
+                    product productToBeAddedToCart=myDatabase.search(productName);
+                    if(productToBeAddedToCart.productName.equals("false")){
+                        System.out.println("Some of the products in customers' cart have been removed from database, they will be removed from customers' cart automatically,product: "+productName);
+
+                    }
+                    else{
+                        Pair<product,Integer> pair= new Pair<product,Integer>(productToBeAddedToCart,quantityDemanded);
+                        customerToBeAddedFromFile.cart.add(pair);
+                    }
+                }
+                customerList.add(customerToBeAddedFromFile);
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("Seems like no database file already exists, will create a new database!");
+        } catch (IOException e) {
+            System.err.println("Unable to read database file!");
+        }
+        //customer myCustomer=new customer("1", 0);
         while(true){
+
             System.out.println("Enter 1 to use as admin, enter 0 to use as customer, any other integer to quit");
             Scanner intScanner=new Scanner(System.in);
             int whatTheUserWants=intScanner.nextInt();
             //administrator case
             if(whatTheUserWants==1){
-                System.out.println("Enter:\n 1: to insert product/category \n 2: delete product/category \n 3: Search for a product \n 4: Modify a product \n 5: Exit as administrator");
-                int userChoice=intScanner.nextInt();
-                if(userChoice==1){
-                    System.out.println("Enter the category");
-                    BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
-                    String category= brObject.readLine();
-                    //String category=intScanner.nextLine();
-                    System.out.println("Enter the subcategory");
-                    String subcategory=brObject.readLine();
-                    System.out.println("Enter the product name");
-                    String productName=brObject.readLine();
-                    myDatabase.insert(category+">"+subcategory, productName);
-                }
-                else if(userChoice==2){
-                    System.out.println("Enter the category");
-                    BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
-                    String category= brObject.readLine();
-                    //String category=intScanner.nextLine();
-                    System.out.println("Enter the subcategory");
-                    String subcategory=brObject.readLine();
-                    System.out.println("Enter the product name, enter nothing if you want to delete the whole subcategory");
-                    String productName=brObject.readLine();
-                    myDatabase.delete(category+">"+subcategory+">"+productName);
-                }
-                else if(userChoice==3){
-                    BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
-                    System.out.println("Enter the product name you wish to search for");
-                    String productName=brObject.readLine();
-                    product returnedProduct=myDatabase.search(productName);
-                    if(!(returnedProduct.productName.equals("false"))){
-                        System.out.println("The path to the product is:\n"+returnedProduct.subcategory+">"+returnedProduct.productName);
-                        System.out.println("The number of units available are:"+returnedProduct.units);
-                        System.out.println("The price of the product is:"+returnedProduct.price);
-                        
+                while(true){
+                    System.out.println("Enter:\n 1: to insert product/category \n 2: delete product/category \n 3: Search for a product \n 4: Modify a product \n Any other integer: Exit as administrator");
+                    int userChoice=intScanner.nextInt();
+                    if(userChoice==1){
+                        System.out.println("Enter the category");
+                        BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
+                        String category= brObject.readLine();
+                        //String category=intScanner.nextLine();
+                        System.out.println("Enter the subcategory");
+                        String subcategory=brObject.readLine();
+                        System.out.println("Enter the product name");
+                        String productName=brObject.readLine();
+                        myDatabase.insert(category+">"+subcategory, productName);
                     }
-                }
-                else if(userChoice==4){
-                    BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
-                    System.out.println("Enter the product name you wish to modify");
-                    String productName=brObject.readLine();
-                    myDatabase.modify(productName);
-                }
-                else if(userChoice==5){
-                    continue;
+                    else if(userChoice==2){
+                        System.out.println("Enter the category");
+                        BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
+                        String category= brObject.readLine();
+                        //String category=intScanner.nextLine();
+                        System.out.println("Enter the subcategory");
+                        String subcategory=brObject.readLine();
+                        System.out.println("Enter the product name, enter nothing if you want to delete the whole subcategory");
+                        String productName=brObject.readLine();
+                        myDatabase.delete(category+">"+subcategory+">"+productName);
+                    }
+                    else if(userChoice==3){
+                        BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
+                        System.out.println("Enter the product name you wish to search for");
+                        String productName=brObject.readLine();
+                        product returnedProduct=myDatabase.search(productName);
+                        if(!(returnedProduct.productName.equals("false"))){
+                            System.out.println("The path to the product is:\n"+returnedProduct.subcategory+">"+returnedProduct.productName);
+                            System.out.println("The number of units available are:"+returnedProduct.units);
+                            System.out.println("The price of the product is:"+returnedProduct.price);
+                            
+                        }
+                    }
+                    else if(userChoice==4){
+                        BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
+                        System.out.println("Enter the product name you wish to modify");
+                        String productName=brObject.readLine();
+                        myDatabase.modify(productName);
+                    }
+                    else {
+                        break;
 
+                    }
                 }
                 
             }
             //customer case
+            
             else if(whatTheUserWants==0){
-                System.out.println("Enter:\n 1: to add funds \n 2: add product to cart \n 3: checkout your cart\n 4: Exit as customer \n ");
-                int userChoice=intScanner.nextInt();
-                if(userChoice==1){
-                    System.out.println("Enter the amount of funds you wish to add");
-                    int fundsToBeAdded=intScanner.nextInt();
-                    myCustomer.addFunds(fundsToBeAdded);
-                }
-                else if(userChoice==2){
-                    System.out.println("Enter the product's name");
-                    BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
-                    String productName= brObject.readLine();
-                    product productToBeAdded=myDatabase.search(productName);
-                    if(!(productToBeAdded.productName.equals("false"))){
-                        //System.out.println("The path to the product is:\n"+returnedProduct.subcategory+">"+returnedProduct.productName);
-                        System.out.println("The number of units available are:"+productToBeAdded.units);
-                        System.out.println("The price of the product is:"+productToBeAdded.price);
-                        System.out.println("Enter the number of units you would like to purchase");
-                        int quantityDemanded=intScanner.nextInt();
-                        myCustomer.addToCart(productToBeAdded,quantityDemanded);
-                        
+                    
+                    System.out.print("Enter your username");
+                    int flag=0;
+                    BufferedReader brObject1 = new BufferedReader(new InputStreamReader(System.in));  
+                    String customerName= brObject1.readLine();
+                    for (int i = 0; i < customerList.size(); i++) {
+                        if(customerList.get(i).customerID.equals(customerName)){
+                            myCustomer=customerList.get(i);
+                            flag=1;
+                            break;
+                        }
                     }
-                }
-                else if(userChoice==3){
-                    myCustomer.chekoutCart(myDatabase);
-                }
-                else if(userChoice==4){
-                    continue;
-                }
+                    if(flag==1){
+                        System.out.println("Welcome Back!");
 
+                    }
+                    else{
+                        System.out.println("Seems like it's your first visit to Amacon! Welcome!");
+                        myCustomer=new customer(customerName,0);
+                        customerList.add(myCustomer);
+                    }
+
+                    while(true){
+                        System.out.println("Enter:\n 1: to add funds \n 2: add product to cart \n 3: checkout your cart\n Any other integer: Exit as customer \n ");
+                        int userChoice=intScanner.nextInt();
+                        if(userChoice==1){
+                            System.out.println("Enter the amount of funds you wish to add");
+                            int fundsToBeAdded=intScanner.nextInt();
+                            myCustomer.addFunds(fundsToBeAdded);
+                        }
+                        else if(userChoice==2){
+                            System.out.println("Enter the product's name");
+                            BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
+                            String productName= brObject.readLine();
+                            product productToBeAdded=myDatabase.search(productName);
+                            if(!(productToBeAdded.productName.equals("false"))){
+                                System.out.println("The number of units available are:"+productToBeAdded.units);
+                                System.out.println("The price of the product is:"+productToBeAdded.price);
+                                System.out.println("Enter the number of units you would like to purchase");
+                                int quantityDemanded=intScanner.nextInt();
+                                myCustomer.addToCart(productToBeAdded,quantityDemanded);
+                                
+                            }
+                        }
+                        else if(userChoice==3){
+                            myCustomer.chekoutCart(myDatabase);
+                        }
+                        else{
+                            break;
+                        }
+                    }   
 
 
             }
             else{
-                System.out.println("Seems like you're not interested, exiting...");
+                System.out.println("Have a good day!, exiting...");
                 try {
                     File file = new File("database.csv"); 
                     file.delete();
                     final Path path = Paths.get("database.csv");
-                   // for(int i=0;i<myDatabase.length();)
                    Iterator<Map.Entry<String, List<product>>> it= myDatabase.databaseMap.entrySet().iterator();
-                   //int flag=0;
                     while (it.hasNext()) {
                         Map.Entry<String, List<product>> pair = (Map.Entry<String, List<product>>)it.next();
                         List<product> productList =pair.getValue();
@@ -384,15 +429,29 @@ class main1{
                             String toWriteToDatabaseFile=productToBeWritten.subcategory+","+productToBeWritten.productName+","+productToBeWritten.price+","+productToBeWritten.units;
                             Files.write(path, Arrays.asList(toWriteToDatabaseFile), StandardCharsets.UTF_8,
                         Files.exists(path) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
-                       //System.out.println(pair.getKey() + " = " + pair.getValue());
                         it.remove(); // avoids a ConcurrentModificationException
                         }
                     }
-                    
-                } catch (final IOException ioe) {
-                    // Add your own exception handling...
+                    file= new File("customer.csv");
+                    file.delete();
+                    final Path path1= Paths.get("customer.csv");
+                    for (int i = 0; i < customerList.size(); i++) {
+                        
+                        customer customerToBeWritten=customerList.get(i);
+                        String toWriteToDatabaseFile=customerToBeWritten.customerID+","+customerToBeWritten.remainingFunds+","+customerToBeWritten.cart.size();
+                        for (int j = 0; j < customerToBeWritten.cart.size(); j++) {
+                            toWriteToDatabaseFile+=","+customerToBeWritten.cart.get(i).getL().productName+","+customerToBeWritten.cart.get(i).getR();
+
+                        }
+                    Files.write(path1, Arrays.asList(toWriteToDatabaseFile), StandardCharsets.UTF_8,
+                        Files.exists(path1) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
+                    }
                 }
-                //intScanner.close();
+
+                    
+                catch (final IOException ioe) {
+                    System.out.println("Some exception has occured while writing to database files!");
+                }
                 return;
             }
         }
