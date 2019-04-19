@@ -145,7 +145,7 @@ class database{
             List<product> productList =pair.getValue();
             for (int i = 0; i < productList.size(); i++) {
                 if(productName.equals((productList.get(i)).productName)){
-                    System.out.println("The path to the product is:"+productList.get(i).subcategory+">"+productList.get(i).productName);
+                    //System.out.println("The path to the product is:"+productList.get(i).subcategory+">"+productList.get(i).productName);
                     
                     return productList.get(i);
 
@@ -187,9 +187,9 @@ class database{
             System.out.println("The number of units demanded aren't available, concerned product is: "+ productToBeBought.productName);
             return remainingFundsWithCustomer;
         }
-        int priceToBePaid=productToBeBought.units*productToBeBought.price;
+        int priceToBePaid=quantityDemanded*productToBeBought.price;
         if(priceToBePaid>remainingFundsWithCustomer){
-            System.out.println("Funds aren't sufficient for this transaction!,concerned product is: "+ productToBeBought.productName);
+            System.out.println("Funds aren't sufficient for this transaction!,concerned product is: "+ productToBeBought.productName + "\nYou need to pay" +priceToBePaid);
             return remainingFundsWithCustomer;
         }
         productToBeBought.units-=quantityDemanded;
@@ -239,10 +239,12 @@ class customer{
 class main1{
     public static void main(String[] args) throws IOException{
         database myDatabase=new database();
+        customer myCustomer=new customer("1", 0);
         while(true){
             System.out.println("Enter 1 to use as admin, enter 0 to use as customer");
             Scanner intScanner=new Scanner(System.in);
             int whatTheUserWants=intScanner.nextInt();
+            //administrator case
             if(whatTheUserWants==1){
                 System.out.println("Enter:\n 1: to insert product/category \n 2: delete product/category \n 3: Search for a product \n 4: Modify a product \n 5: Exit as administrator");
                 int userChoice=intScanner.nextInt();
@@ -257,13 +259,78 @@ class main1{
                     String productName=brObject.readLine();
                     myDatabase.insert(category+">"+subcategory, productName);
                 }
+                else if(userChoice==2){
+                    System.out.println("Enter the category");
+                    BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
+                    String category= brObject.readLine();
+                    //String category=intScanner.nextLine();
+                    System.out.println("Enter the subcategory");
+                    String subcategory=brObject.readLine();
+                    System.out.println("Enter the product name, enter nothing if you want to delete the whole subcategory");
+                    String productName=brObject.readLine();
+                    myDatabase.delete(category+">"+subcategory+">"+productName);
+                }
+                else if(userChoice==3){
+                    BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
+                    System.out.println("Enter the product name you wish to search for");
+                    String productName=brObject.readLine();
+                    product returnedProduct=myDatabase.search(productName);
+                    if(!(returnedProduct.productName.equals("false"))){
+                        System.out.println("The path to the product is:\n"+returnedProduct.subcategory+">"+returnedProduct.productName);
+                        System.out.println("The number of units available are:"+returnedProduct.units);
+                        System.out.println("The price of the product is:"+returnedProduct.price);
+                        
+                    }
+                }
+                else if(userChoice==4){
+                    BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
+                    System.out.println("Enter the product name you wish to modify");
+                    String productName=brObject.readLine();
+                    myDatabase.modify(productName);
+                }
+                else if(userChoice==5){
+                    continue;
+
+                }
                 
             }
+            //customer case
             else if(whatTheUserWants==0){
+                System.out.println("Enter:\n 1: to add funds \n 2: add product to cart \n 3: checkout your cart\n 4: Exit as customer \n ");
+                int userChoice=intScanner.nextInt();
+                if(userChoice==1){
+                    System.out.println("Enter the amount of funds you wish to add");
+                    int fundsToBeAdded=intScanner.nextInt();
+                    myCustomer.addFunds(fundsToBeAdded);
+                }
+                else if(userChoice==2){
+                    System.out.println("Enter the product's name");
+                    BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
+                    String productName= brObject.readLine();
+                    product productToBeAdded=myDatabase.search(productName);
+                    if(!(productToBeAdded.productName.equals("false"))){
+                        //System.out.println("The path to the product is:\n"+returnedProduct.subcategory+">"+returnedProduct.productName);
+                        System.out.println("The number of units available are:"+productToBeAdded.units);
+                        System.out.println("The price of the product is:"+productToBeAdded.price);
+                        System.out.println("Enter the number of units you would like to purchase");
+                        int quantityDemanded=intScanner.nextInt();
+                        myCustomer.addToCart(productToBeAdded,quantityDemanded);
+                        
+                    }
+                }
+                else if(userChoice==3){
+                    myCustomer.chekoutCart(myDatabase);
+                }
+                else if(userChoice==4){
+                    continue;
+                }
+
+
 
             }
             else{
                 System.out.println("Seems like you're not interested, exiting...");
+                //intScanner.close();
                 return;
             }
         }
