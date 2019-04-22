@@ -1,3 +1,6 @@
+//import org.graalvm.compiler.loop.LoopsData;
+import java.util.*;
+import java.io.*;
 class account{
     int accountNumber;
     int balance;
@@ -45,23 +48,57 @@ class Looper implements Runnable {
     }
 
     @Override
-    public void run() {
+    public void run (){
+        try{
         for(int i=start; i<end; i++){
-           // if(i%10000==0)
-           // System.out.println("thread id : " + Thread.currentThread().getId() + "; index : " + i) ;
-            int amount=transactionsBunch[i].amount;
-            
+           if(i%1000000==0)
+             System.out.println("thread id : " + Thread.currentThread().getId() + "; index : " + i) ;
+            //int amount=transactionsBunch[i].amount;
+           //for(int j=-100000000;j<1000000000;j+=0.01){
+           //    j+=0.05;
+           //}
             accountBunch[transactionsBunch[i].debitAccount].debit(transactionsBunch[i].amount);
+           // Thread.sleep(30);
             accountBunch[transactionsBunch[i].creditAccount].credit(transactionsBunch[i].amount);
+           // Thread.sleep(30);
             //int creditAccount=transactionsBunch[i].creditAccount;
 
             
 
+        }}
+        catch(Exception e){
+            System.out.println("lol");
         }
     }
 }
 class main1{
-    public static void main(String[] args){
+    private static ArrayList<Thread> arrThreads = new ArrayList<Thread>();
+    private static void this_func(account[] accountBunch,transaction[] transactionBunch) throws InterruptedException{
+
+        
+        Thread looper1 = new Thread(new Looper(0,10000000,transactionBunch,accountBunch));
+        // Thread looper2 = new Thread (new Looper(2500001,5000000,transactionBunch,accountBunch));
+       
+        // Thread looper3 = new Thread (new Looper(5000001,7500000,transactionBunch,accountBunch));
+        // Thread looper4 = new Thread (new Looper(7500001,10000000,transactionBunch,accountBunch));
+        looper1.start();
+        arrThreads.add(looper1);
+        //Thread.sleep(100);
+
+        
+        // looper2.start();
+        // arrThreads.add(looper2);
+        // looper3.start();
+        // arrThreads.add(looper3);
+        // looper4.start();
+        // arrThreads.add(looper3);
+        //return;
+        for (int i = 0; i < arrThreads.size(); i++) 
+        {
+            arrThreads.get(i).join(); 
+        }
+    }
+    public static void main(String[] args) throws InterruptedException{
         account[] accountBunch=new account[10000];
         System.out.println(accountBunch.length);
         for(int i=0;i<accountBunch.length;i++){
@@ -72,18 +109,18 @@ class main1{
             transactionBunch[i]=new transaction(i%10000, (i+1)%10000, 1);
         }
 
-        Thread looper1 = new Thread(new Looper(1,10000000,transactionBunch,accountBunch));
-        //Thread looper2 = new Thread (new Looper(5000001,10000000,transactionBunch,accountBunch));
         //Thread looper3 = new Thread (new Looper(500001,7500000,transactionBunch,accountBunch));
         //Thread looper4 = new Thread (new Looper(7500001,10000000,transactionBunch,accountBunch));
-        final long startTime = System.nanoTime();
-
-        looper1.start();
-        //looper2.start();
+        
+        final long startTime = System.currentTimeMillis();
         //looper3.start();
         //looper4.start();
-        final long endTime = System.nanoTime();
-        System.out.println("Total execution time: " + (endTime - startTime));
+        this_func(accountBunch,transactionBunch);
+
+       final long endTime = System.currentTimeMillis();
+
+       // System.out.println("HEEELLLLLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo");
+       System.out.println("Total execution time: " + (endTime - startTime));
 
     }
 }
