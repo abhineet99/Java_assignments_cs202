@@ -39,6 +39,7 @@ class Looper implements Runnable {
 
     private int start;
     private int end;
+    private int transactionFailCount;
     private account[] accountBunch;
     private transaction[] transactionsBunch;
     public Looper(int start, int end,transaction[] transactionBunch,account[] accountBunch){
@@ -46,6 +47,7 @@ class Looper implements Runnable {
         this.end = end;
         this.transactionsBunch=transactionBunch;
         this.accountBunch=accountBunch;
+        this.transactionFailCount=0;
     }
 
     @Override
@@ -54,18 +56,15 @@ class Looper implements Runnable {
         for(int i=start; i<end; i++){
            if(i%1000000==0)
              System.out.println("thread id : " + Thread.currentThread().getId() + "; index : " + i) ;
-            //int amount=transactionsBunch[i].amount;
-           //for(int j=-100000000;j<1000000000;j+=0.01){
-           //    j+=0.05;
-           //}
-            accountBunch[transactionsBunch[i].debitAccount].debit(transactionsBunch[i].amount);
-           // Thread.sleep(30);
+            int check=accountBunch[transactionsBunch[i].debitAccount].debit(transactionsBunch[i].amount);
+           if(check==1)
+           {
+            //System.out.println("lol");   
             accountBunch[transactionsBunch[i].creditAccount].credit(transactionsBunch[i].amount);
-           // Thread.sleep(30);
-            //int creditAccount=transactionsBunch[i].creditAccount;
-
+           }
+            else
+            accountBunch[10000].credit(1);;
             
-
         }}
         catch(Exception e){
             System.out.println("lol");
@@ -100,28 +99,21 @@ class main1{
         }
     }
     public static void main(String[] args) throws InterruptedException{
-        account[] accountBunch=new account[10000];
+        account[] accountBunch=new account[10001];
         System.out.println(accountBunch.length);
         for(int i=0;i<accountBunch.length;i++){
             accountBunch[i]=new account(i,10000);
         }
         transaction[] transactionBunch= new transaction[10000000];
         for(int i=0;i<transactionBunch.length;i++){
-            transactionBunch[i]=new transaction(i%10000, (i+1)%10000, 1);
+            transactionBunch[i]=new transaction(i%10000, (i+1)%10000, 1000);
         }
-
-        //Thread looper3 = new Thread (new Looper(500001,7500000,transactionBunch,accountBunch));
-        //Thread looper4 = new Thread (new Looper(7500001,10000000,transactionBunch,accountBunch));
-        
         final long startTime = System.currentTimeMillis();
-        //looper3.start();
-        //looper4.start();
         this_func(accountBunch,transactionBunch);
-
        final long endTime = System.currentTimeMillis();
-
-       // System.out.println("HEEELLLLLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo");
        System.out.println("Total execution time: " + (endTime - startTime));
+       int failed=accountBunch[10000].balance-10000;
+       System.out.println("Total transactions failed: "+failed) ;
 
     }
 }

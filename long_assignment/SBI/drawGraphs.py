@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
-thread_4=np.array([104,94,93,104,87])
-thread_3=np.array([112,103,96,104,103])
-thread_2=np.array([99,104,108,115,118])
-thread_1 =np.array([152,145,137,147,132])
+thread_4=np.array([6246])
+thread_3=np.array([6339])
+thread_2=np.array([6459])
+thread_1 =np.array([6488])
 x=[]
 x.append(thread_1)
 x.append(thread_2)
@@ -27,16 +27,14 @@ labels=["1","2","3","4"]
 #ax = plt.subplots(1,1)
 #ax.set_xticks(labels)     
 plt.xlabel('Number of threads', fontsize=18)
-plt.ylabel('Parallel Efficiency', fontsize=16)
+plt.ylabel('Exec. Time', fontsize=16)
 plt.xlim(-1, 4)
 #plt.show()
 print(means)
 min_mean=means[0]
-for i in range(len(means)):
-    means[i]=min_mean/means[i]
+
 print(means)
-for i in range(len(means)):    
-    means[i]=means[i]/(i+1)
+
 plt.plot(labels,means,'ro')
 print(means)
 plt.show()
