@@ -1,4 +1,0 @@
-New line to append
-iPhone>Apple,1,2
-sabji>gobhi,12,12
-Samsung>Phone,1,1

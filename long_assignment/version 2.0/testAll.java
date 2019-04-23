@@ -6,6 +6,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({testClass.class})
 public class testAll{
     public static void main(String[] args){
-        System.out.println("I was here");
+        System.out.println("Test in progress");
     }
 }

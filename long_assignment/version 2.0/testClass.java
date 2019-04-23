@@ -78,7 +78,7 @@ public class testClass{
             List<product> productList =pair.getValue();
             for (int i = 0; i < productList.size(); i++) {
                 product productToBeWritten=productList.get(i);
-                String toWriteToDatabaseFile=productToBeWritten.subcategory+","+productToBeWritten.productName+","+productToBeWritten.price+","+productToBeWritten.units;
+                String toWriteToDatabaseFile=productToBeWritten.getSubcategory()+","+productToBeWritten.getProductName()+","+productToBeWritten.getPrice()+","+productToBeWritten.getUnits();
                 Files.write(path, Arrays.asList(toWriteToDatabaseFile), StandardCharsets.UTF_8,
             Files.exists(path) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
             it.remove(); // avoids a ConcurrentModificationException
@@ -101,7 +101,7 @@ public class testClass{
             System.err.println("Unable to read database file!");
         }
         product testProduct=myDatabase1.search("s8");
-        if(testProduct.price==23) //matched a random attribute of a product
+        if(testProduct.getPrice()==23) //matched a random attribute of a product
         System.out.println("Serialization test for database complete");
         else
         System.out.println("Serialization test for database failed");
@@ -120,9 +120,9 @@ public class testClass{
         for (int i = 0; i < customerList.size(); i++) {
             
             customer customerToBeWritten=customerList.get(i);
-            String toWriteToDatabaseFile=customerToBeWritten.customerID+","+customerToBeWritten.remainingFunds+","+customerToBeWritten.cart.size();
+            String toWriteToDatabaseFile=customerToBeWritten.getCustomerID()+","+customerToBeWritten.getRemainingFunds()+","+customerToBeWritten.cart.size();
             for (int j = 0; j < customerToBeWritten.cart.size(); j++) {
-                toWriteToDatabaseFile+=","+customerToBeWritten.cart.get(i).getL().productName+","+customerToBeWritten.cart.get(i).getR();
+                toWriteToDatabaseFile+=","+customerToBeWritten.cart.get(i).getL().getProductName()+","+customerToBeWritten.cart.get(i).getR();
 
             }
         Files.write(path1, Arrays.asList(toWriteToDatabaseFile), StandardCharsets.UTF_8,
@@ -164,7 +164,7 @@ public class testClass{
         } catch (IOException e) {
             System.err.println("Unable to read database file!");
         }    
-        if(customerList.get(0).cart.get(0).getL().productName.equals(customerList1.get(0).cart.get(0).getL().productName))
+        if(customerList.get(0).cart.get(0).getL().getProductName().equals(customerList1.get(0).cart.get(0).getL().getProductName()))
         System.out.println("Serialization test for customer Cart complete");
         else
         System.out.println("Serialization test for customer Cart failed");
