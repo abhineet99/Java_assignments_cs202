@@ -1,6 +1,7 @@
 //import org.graalvm.compiler.loop.LoopsData;
 import java.util.*;
 import java.io.*;
+
 class account{
     int accountNumber;
     int balance;
@@ -76,22 +77,22 @@ class main1{
     private static void this_func(account[] accountBunch,transaction[] transactionBunch) throws InterruptedException{
 
         
-        Thread looper1 = new Thread(new Looper(0,10000000,transactionBunch,accountBunch));
-        // Thread looper2 = new Thread (new Looper(2500001,5000000,transactionBunch,accountBunch));
+        Thread looper1 = new Thread(new Looper(0,2500000,transactionBunch,accountBunch));
+        Thread looper2 = new Thread (new Looper(2500001,5000000,transactionBunch,accountBunch));
        
-        // Thread looper3 = new Thread (new Looper(5000001,7500000,transactionBunch,accountBunch));
-        // Thread looper4 = new Thread (new Looper(7500001,10000000,transactionBunch,accountBunch));
+        Thread looper3 = new Thread (new Looper(5000001,7500000,transactionBunch,accountBunch));
+        Thread looper4 = new Thread (new Looper(7500001,10000000,transactionBunch,accountBunch));
         looper1.start();
         arrThreads.add(looper1);
         //Thread.sleep(100);
 
         
-        // looper2.start();
-        // arrThreads.add(looper2);
-        // looper3.start();
-        // arrThreads.add(looper3);
-        // looper4.start();
-        // arrThreads.add(looper3);
+        looper2.start();
+        arrThreads.add(looper2);
+        looper3.start();
+        arrThreads.add(looper3);
+        looper4.start();
+        arrThreads.add(looper4);
         //return;
         for (int i = 0; i < arrThreads.size(); i++) 
         {
