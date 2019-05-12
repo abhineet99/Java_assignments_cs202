@@ -1,13 +1,16 @@
-<<<<<<< HEAD
-# Java_assignments_cs202
-This repository contains the codes for the assignments in CS202 course, programming pragmatics and paradigms.
+
+This repository contains the codes for the assignments given in BTech course.
 =======
 
-CS-201 Data structures and CS 203 Digital Logic Design Course Assignments.
+CS-201 Data structures
 
-Unless specified in the name, the assignment is of data structures (CS201).
+CS 203 Digital Logic Design Course
 
-Assignment Data:
+CS-202 Programming Pragmatics and Paradigms.
+
+
+
+Assignment Data (CS 201):
 
 Assignment 1: Understanding OOPS, handling pointers and linked lists.
 
@@ -21,4 +24,4 @@ Assignment 5: Implemented AVL Tree
 
 Assignment 6: Implemented Directed Graph and Shortest Path Algorithm
 
->>>>>>> Assignments-Sem3/master
+
