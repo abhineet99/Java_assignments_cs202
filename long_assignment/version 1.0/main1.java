@@ -2,18 +2,70 @@ import java.awt.SystemTray;
 import java.util.*;
 import java.io.*;
 //import java.util.Scanner;
+class productAtSamePathException extends Exception{
+    private static final long serialVersionUID = 1L;
+
+    // constructor
+    productAtSamePathException(){
+        super("The product is already present! You may have wanted to use modify functionality.");
+    }
+}
+class InvalidDeletePathException extends Exception{
+    private static final long serialVersionUID = 1L;
+
+    // constructor
+    InvalidDeletePathException(){
+        super("Invalid Path");
+    }
+}
+class OutOfStockException extends Exception{
+    private static final long serialVersionUID = 1L;
+
+    // constructor
+    OutOfStockException(){
+        super("The requested product is out of stock!");
+    }
+    int returnRemainingFunds(int remainingFunds){
+        return remainingFunds;
+    }
+}
+class FundsNotSufficient extends Exception{
+    private static final long serialVersionUID = 1L;
+
+    FundsNotSufficient(int funds) {
+        super("Funds aren't sufficient for this transaction, you need to pay" + funds);
+    }
+    int returnRemainingFunds(int remainingFunds){
+        return remainingFunds;
+    }
+}
 class product{
-    String category;
-    String subcategory;
-    String productName;
-    int price;
-    int units;
+    private String category;
+    private String subcategory;
+    private String productName;
+    private int price;
+    private int units;
     public product(String subcategory,String productName,int price,int units){
         //this.category=category;
         this.subcategory=subcategory;
         this.productName=productName;
         this.price=price;
         this.units=units;
+    }
+    public String getCategory(){
+        return this.category;
+    }
+    public String getSubcategory(){
+        return this.subcategory;
+    }
+    public String getProductName(){
+        return this.productName;
+    }
+    public int getUnits(){
+        return this.units;
+    }
+    public int getPrice(){
+        return this.price;
     }
     public void product_modify(int price,int units){
         this.price=price;
@@ -30,23 +82,33 @@ class database{
     //product[] prod_collection=new product[25];
     //List<product> product_list; //=new ArrayList<product>();
     Map<String, List<product>> databaseMap;// = new HashMap<>();
-
+    private int revenue;
 
     public database(){
+        revenue=0;
         databaseMap = new HashMap<String, List<product>>();;
 //product_list=new ArrayList<product>();
+    }
+    public int getRevenue(){
+        return revenue;
     }
     public void insert(String subcategory,String productName){
         if(databaseMap.containsKey(subcategory)){
             List<product> productListInThatCategory=databaseMap.get(subcategory);
             int flag=0;
-            for (int i = 0; i < productListInThatCategory.size(); i++) {
-                if(productName.equals((productListInThatCategory.get(i)).productName)){
-                    System.out.println("Error: The product is already present! You may have wanted to use modify functionality.");
-                    flag=1;
-                    break;
-                }
+            try{
+                for (int i = 0; i < productListInThatCategory.size(); i++) {
+                    if(productName.equals((productListInThatCategory.get(i)).getProductName())){
+                    // System.out.println("Error: The product is already present! You may have wanted to use modify functionality.");
+                        flag=1;
+                        throw new productAtSamePathException();
+                    
+                    }
 
+                }
+            }
+            catch(productAtSamePathException ex){
+                System.out.println(ex.toString()+ex.getMessage());
             }
             if(flag!=1){
                 System.out.println("Seems like it is a new product! Please enter the price and units to enter the product into database");
@@ -85,7 +147,7 @@ class database{
             }
         }
 
-
+        try{
         //it is a product case
         if(greaterThanCount==2){
             String[] parts = subcategory.split(">");
@@ -93,29 +155,32 @@ class database{
             subcategory = parts[1]; //subcategory
             String productName=parts[2];
             subcategory=category+">"+subcategory;
-
-            if(databaseMap.containsKey(subcategory)){
-                List<product> productListInThatCategory=databaseMap.get(subcategory);
-                int flag=0;
-                for (int i = 0; i < productListInThatCategory.size(); i++) {
-                    if(productName.equals((productListInThatCategory.get(i)).productName)){
-                        productListInThatCategory.remove(i);
-                        System.out.println("The product has been removed!");
-                        flag=1;
-                        break;
+            
+                if(databaseMap.containsKey(subcategory)){
+                    List<product> productListInThatCategory=databaseMap.get(subcategory);
+                    int flag=0;
+                    for (int i = 0; i < productListInThatCategory.size(); i++) {
+                        if(productName.equals((productListInThatCategory.get(i)).getProductName())){
+                            productListInThatCategory.remove(i);
+                            System.out.println("The product has been removed!");
+                            flag=1;
+                            break;
+                        }
+                    databaseMap.put(subcategory,productListInThatCategory);    
+        
                     }
-                databaseMap.put(subcategory,productListInThatCategory);    
-    
+                    if(flag!=1){
+                        throw new InvalidDeletePathException();
+        
+                    }
+                    
                 }
-                if(flag!=1){
-                    System.out.println("Invalid path");
-    
+                else{
+                    throw new InvalidDeletePathException();
+                    //System.out.println("Invalid path!");
                 }
-                
-            }
-            else{
-                System.out.println("Invalid path!");
-            }
+            
+
 
 
 
@@ -129,12 +194,17 @@ class database{
                 System.out.println("The product has been removed!");
             }
             else{
-                System.out.println("Invalid path!");
+                throw new InvalidDeletePathException();
+                //System.out.println("Invalid path!");
             }
 
         }
         else{
-            System.out.println("Invalid path!");
+            throw new InvalidDeletePathException();
+        }
+    }
+        catch(Exception e){
+            System.out.println(e.toString()+e.getMessage());
         }
     }
     public product search(String productName){
@@ -144,14 +214,14 @@ class database{
             Map.Entry<String, List<product>> pair = (Map.Entry<String, List<product>>)it.next();
             List<product> productList =pair.getValue();
             for (int i = 0; i < productList.size(); i++) {
-                if(productName.equals((productList.get(i)).productName)){
+                if(productName.equals((productList.get(i)).getProductName())){
                     //System.out.println("The path to the product is:"+productList.get(i).subcategory+">"+productList.get(i).productName);
                     
                     return productList.get(i);
 
                 }
             //System.out.println(pair.getKey() + " = " + pair.getValue());
-            it.remove(); // avoids a ConcurrentModificationException
+            //it.remove(); // avoids a ConcurrentModificationException
             }
         }
         System.out.println("Product not found, returning a false reference!");
@@ -163,7 +233,7 @@ class database{
     }
     public void modify(String productName){
         product productToBeModified=search(productName);
-        if((productToBeModified.productName).equals("false")){
+        if((productToBeModified.getProductName()).equals("false")){
             System.out.println("The product ain't there in the database!");
         }
         else{
@@ -182,18 +252,33 @@ class database{
         }
     }
     public int sale(product productToBeBought,int quantityDemanded,int remainingFundsWithCustomer){
-        int unitsAvailable=productToBeBought.units;
-        if(unitsAvailable<quantityDemanded){
-            System.out.println("The number of units demanded aren't available, concerned product is: "+ productToBeBought.productName);
-            return remainingFundsWithCustomer;
+        int unitsAvailable=productToBeBought.getUnits();
+        int priceToBePaid=quantityDemanded*productToBeBought.getPrice();
+        try{
+            if(unitsAvailable<quantityDemanded){
+                //System.out.println("The number of units demanded aren't available, concerned product is: "+ productToBeBought.getProductName());
+                //return remainingFundsWithCustomer;
+                throw new OutOfStockException();
+            }
+            
+            
+            if(priceToBePaid>remainingFundsWithCustomer){
+                throw new FundsNotSufficient(priceToBePaid);
+                //System.out.println("Funds aren't sufficient for this transaction!,concerned product is: "+ productToBeBought.getProductName() + "\nYou need to pay" +priceToBePaid);
+                //return remainingFundsWithCustomer;
+            }
         }
-        int priceToBePaid=quantityDemanded*productToBeBought.price;
-        if(priceToBePaid>remainingFundsWithCustomer){
-            System.out.println("Funds aren't sufficient for this transaction!,concerned product is: "+ productToBeBought.productName + "\nYou need to pay" +priceToBePaid);
-            return remainingFundsWithCustomer;
+        catch(OutOfStockException e){
+            System.out.println(e.toString()+e.getMessage() );
+            return e.returnRemainingFunds(remainingFundsWithCustomer);
         }
-        productToBeBought.units-=quantityDemanded;
-        System.out.println("Transaction successful of product: "+productToBeBought.productName);
+        catch(FundsNotSufficient e){
+            System.out.print(e.toString()+e.getMessage());
+            return e.returnRemainingFunds(remainingFundsWithCustomer);
+        }
+        revenue+=priceToBePaid;
+        productToBeBought.product_modify_units(productToBeBought.getUnits()-quantityDemanded);
+        System.out.println("Transaction successful of product: "+productToBeBought.getProductName());
         return remainingFundsWithCustomer-priceToBePaid;
 
     }
@@ -212,15 +297,16 @@ class Pair<L,R> {
     public void setR(R r){ this.r = r; }
 }
 class customer{
-    List<Pair<product,Integer>> cart; //=new ArrayList<product>();
-    String customerID;
-    int remainingFunds;
+    private List<Pair<product,Integer>> cart; //=new ArrayList<product>();
+    private String customerID;
+    private int remainingFunds;
     public customer(String customerID,int funds){
         cart=new ArrayList<Pair<product,Integer>>();
         this.customerID=customerID;
         this.remainingFunds=funds;
 
     }
+
     public void chekoutCart(database myDatabase){
         for (int i = 0; i < cart.size(); i++) {
             this.remainingFunds=myDatabase.sale(cart.get(i).getL(),cart.get(i).getR(),this.remainingFunds);
@@ -268,6 +354,11 @@ class main1{
                     String subcategory=brObject.readLine();
                     System.out.println("Enter the product name, enter nothing if you want to delete the whole subcategory");
                     String productName=brObject.readLine();
+                    if((productName.length()==0)){
+                        myDatabase.delete(category+">"+subcategory);
+                        //System.out.println("hello");
+                    }
+                    else
                     myDatabase.delete(category+">"+subcategory+">"+productName);
                 }
                 else if(userChoice==3){
@@ -275,10 +366,10 @@ class main1{
                     System.out.println("Enter the product name you wish to search for");
                     String productName=brObject.readLine();
                     product returnedProduct=myDatabase.search(productName);
-                    if(!(returnedProduct.productName.equals("false"))){
-                        System.out.println("The path to the product is:\n"+returnedProduct.subcategory+">"+returnedProduct.productName);
-                        System.out.println("The number of units available are:"+returnedProduct.units);
-                        System.out.println("The price of the product is:"+returnedProduct.price);
+                    if(!(returnedProduct.getProductName().equals("false"))){
+                        System.out.println("The path to the product is:\n"+returnedProduct.getSubcategory()+">"+returnedProduct.getProductName());
+                        System.out.println("The number of units available are:"+returnedProduct.getUnits());
+                        System.out.println("The price of the product is:"+returnedProduct.getPrice());
                         
                     }
                 }
@@ -308,10 +399,10 @@ class main1{
                     BufferedReader brObject = new BufferedReader(new InputStreamReader(System.in));  
                     String productName= brObject.readLine();
                     product productToBeAdded=myDatabase.search(productName);
-                    if(!(productToBeAdded.productName.equals("false"))){
+                    if(!(productToBeAdded.getProductName().equals("false"))){
                         //System.out.println("The path to the product is:\n"+returnedProduct.subcategory+">"+returnedProduct.productName);
-                        System.out.println("The number of units available are:"+productToBeAdded.units);
-                        System.out.println("The price of the product is:"+productToBeAdded.price);
+                        System.out.println("The number of units available are:"+productToBeAdded.getUnits());
+                        System.out.println("The price of the product is:"+productToBeAdded.getPrice());
                         System.out.println("Enter the number of units you would like to purchase");
                         int quantityDemanded=intScanner.nextInt();
                         myCustomer.addToCart(productToBeAdded,quantityDemanded);
@@ -329,7 +420,8 @@ class main1{
 
             }
             else{
-                System.out.println("Seems like you're not interested, exiting...");
+                System.out.println("exiting...");
+                System.out.println("Revenue is: "+myDatabase.getRevenue());
                 //intScanner.close();
                 return;
             }
